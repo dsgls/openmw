@@ -7,7 +7,7 @@ mkdir -p build
 cd build
 
 # Running CMake...
-cmake ../
+cmake ../ $@
 
 # Building with $NPROC CPU...
 make -j $NPROC
