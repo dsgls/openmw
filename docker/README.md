@@ -15,3 +15,9 @@ The Z option tells Docker to label the content with a private unshared label.
 ```
 docker run -v /path/to/openmw:/openmw:Z -e NPROC=2 -it openmw.LINUX_VERSION
 ```
+
+Extra parameters will be passed on to cmake. Example:
+```
+docker run -v /path/to/openmw:/openmw -e NPROC=2 -it openmw.ubuntu -DBUILD_OSG_PLUGINS_BY_DEFAULT=0 -DBUILD_OSG_PLUGIN_OSG=1
+```
+
