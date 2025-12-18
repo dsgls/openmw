@@ -21,10 +21,10 @@ All builds and tests should be performed in the build container (openmw.ubuntu).
 docker build -f Dockerfile.ubuntu -t openmw.ubuntu .
 
 # Standard build
-docker run -v ./:/openmw --rm -it openmw.ubuntu -DCMAKE_BUILD_TYPE=RelWithDebInfo
+docker run -v ./:/openmw --rm openmw.ubuntu -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
 # Build for development (with tests and benchmarks)
-docker run -v ./:/openmw --rm -it openmw.ubuntu \
+docker run -v ./:/openmw --rm openmw.ubuntu \
   -DCMAKE_BUILD_TYPE=Debug \
   -DBUILD_COMPONENTS_TESTS=ON \
   -DBUILD_OPENMW_TESTS=ON \
@@ -32,36 +32,36 @@ docker run -v ./:/openmw --rm -it openmw.ubuntu \
   -DBUILD_BENCHMARKS=ON
 
 # Build specific targets
-docker run -v ./:/openmw --rm -it openmw.ubuntu --build . --target openmw
-docker run -v ./:/openmw --rm -it openmw.ubuntu --build . --target opencs
-docker run -v ./:/openmw --rm -it openmw.ubuntu --build . --target components_tests
+docker run -v ./:/openmw --rm openmw.ubuntu --build . --target openmw
+docker run -v ./:/openmw --rm openmw.ubuntu --build . --target opencs
+docker run -v ./:/openmw --rm openmw.ubuntu --build . --target components_tests
 ```
 
 ### Testing
 ```bash
 # Run OpenMW tests (requires -DBUILD_OPENMW_TESTS=ON)
-docker run -v ./:/openmw --rm -it --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && ./openmw-tests'
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && ./openmw-tests'
 
 # Run OpenMW-CS tests (requires -DBUILD_OPENCS_TESTS=ON)
-docker run -v ./:/openmw --rm -it --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && ./openmw-cs-tests'
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && ./openmw-cs-tests'
 
 # Run component tests (requires -DBUILD_COMPONENTS_TESTS=ON)
-docker run -v ./:/openmw --rm -it --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && ./components-tests'
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && ./components-tests'
 ```
 
 ### Code Quality
 ```bash
 # Format code with clang-format (from repo root)
-docker run -v ./:/openmw --rm -it --entrypoint sh openmw.ubuntu -c 'cd /openmw && clang-format -i <file>'
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw && clang-format -i <file>'
 
 # Check formatting without modifying
-docker run -v ./:/openmw --rm -it --entrypoint sh openmw.ubuntu -c 'cd /openmw && CI/check_clang_format.sh'
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw && CI/check_clang_format.sh'
 
 # Check CMake formatting
-docker run -v ./:/openmw --rm -it --entrypoint sh openmw.ubuntu -c 'cd /openmw && CI/check_cmake_format.sh'
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw && CI/check_cmake_format.sh'
 
 # Check file naming conventions
-docker run -v ./:/openmw --rm -it --entrypoint sh openmw.ubuntu -c 'cd /openmw && CI/check_file_names.sh'
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw && CI/check_file_names.sh'
 ```
 
 ### Running OpenMW
