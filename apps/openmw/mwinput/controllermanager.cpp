@@ -84,6 +84,57 @@ namespace MWInput
 
     void ControllerManager::update(float dt)
     {
+        // D-pad repeat logic for GUI navigation
+        if (MWBase::Environment::get().getWindowManager()->isGuiMode()
+            && mDPadRepeatState.mHeldButton != SDL_CONTROLLER_BUTTON_INVALID && Settings::input().mEnableController)
+        {
+            mDPadRepeatState.mRepeatTimer += dt;
+
+            bool shouldRepeat = false;
+
+            if (!mDPadRepeatState.mInitialDelayPassed)
+            {
+                // Check if initial delay passed
+                if (mDPadRepeatState.mRepeatTimer >= DPAD_REPEAT_INITIAL_DELAY)
+                {
+                    mDPadRepeatState.mInitialDelayPassed = true;
+                    mDPadRepeatState.mRepeatTimer = 0.0f;
+                    shouldRepeat = true;
+                }
+            }
+            else
+            {
+                // In repeat mode - check if interval passed
+                if (mDPadRepeatState.mRepeatTimer >= DPAD_REPEAT_INTERVAL)
+                {
+                    mDPadRepeatState.mRepeatTimer = 0.0f;
+                    shouldRepeat = true;
+                }
+            }
+
+            if (shouldRepeat)
+            {
+                // Create synthetic button press event
+                SDL_ControllerButtonEvent repeatEvent;
+                repeatEvent.type = SDL_CONTROLLERBUTTONDOWN;
+                repeatEvent.timestamp = SDL_GetTicks();
+                repeatEvent.which = mDPadRepeatState.mDeviceID;
+                repeatEvent.button = static_cast<Uint8>(mDPadRepeatState.mHeldButton);
+                repeatEvent.state = SDL_PRESSED;
+
+                // Re-inject the button press
+                gamepadToGuiControl(repeatEvent);
+            }
+        }
+        else if (!MWBase::Environment::get().getWindowManager()->isGuiMode())
+        {
+            // Clear state if we're not in GUI mode anymore
+            mDPadRepeatState.mHeldButton = SDL_CONTROLLER_BUTTON_INVALID;
+            mDPadRepeatState.mDeviceID = -1;
+            mDPadRepeatState.mRepeatTimer = 0.0f;
+            mDPadRepeatState.mInitialDelayPassed = false;
+        }
+
         if (mGuiCursorEnabled && !(mJoystickLastUsed && !mGamepadGuiCursorEnabled))
         {
             float xAxis = mBindingsManager->getActionValue(A_MoveLeftRight) * 2.0f - 1.0f;
@@ -134,6 +185,15 @@ namespace MWInput
         mJoystickLastUsed = true;
         if (MWBase::Environment::get().getWindowManager()->isGuiMode())
         {
+            // Track D-pad button for repeat
+            if (isDPadButton(static_cast<SDL_GameControllerButton>(arg.button)))
+            {
+                mDPadRepeatState.mHeldButton = static_cast<SDL_GameControllerButton>(arg.button);
+                mDPadRepeatState.mDeviceID = deviceID;
+                mDPadRepeatState.mRepeatTimer = 0.0f;
+                mDPadRepeatState.mInitialDelayPassed = false;
+            }
+
             if (gamepadToGuiControl(arg))
                 return;
 
@@ -180,6 +240,15 @@ namespace MWInput
         {
             MWBase::Environment::get().getLuaManager()->inputEvent(
                 { MWBase::LuaManager::InputEvent::ControllerReleased, arg.button });
+        }
+
+        // Clear repeat state when D-pad button released
+        if (mDPadRepeatState.mHeldButton == static_cast<SDL_GameControllerButton>(arg.button))
+        {
+            mDPadRepeatState.mHeldButton = SDL_CONTROLLER_BUTTON_INVALID;
+            mDPadRepeatState.mDeviceID = -1;
+            mDPadRepeatState.mRepeatTimer = 0.0f;
+            mDPadRepeatState.mInitialDelayPassed = false;
         }
 
         if (!Settings::input().mEnableController || MWBase::Environment::get().getInputManager()->controlsDisabled())
@@ -602,5 +671,11 @@ namespace MWInput
     void ControllerManager::touchpadReleased(int deviceId, const SDLUtil::TouchEvent& arg)
     {
         MWBase::Environment::get().getLuaManager()->inputEvent({ MWBase::LuaManager::InputEvent::TouchReleased, arg });
+    }
+
+    bool ControllerManager::isDPadButton(SDL_GameControllerButton button) const
+    {
+        return button == SDL_CONTROLLER_BUTTON_DPAD_UP || button == SDL_CONTROLLER_BUTTON_DPAD_DOWN
+            || button == SDL_CONTROLLER_BUTTON_DPAD_LEFT || button == SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
     }
 }

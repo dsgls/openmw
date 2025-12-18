@@ -60,6 +60,8 @@ namespace MWInput
 
         int getControllerType();
 
+        bool isDPadButton(SDL_GameControllerButton button) const;
+
         BindingsManager* mBindingsManager;
         MouseManager* mMouseManager;
 
@@ -68,6 +70,18 @@ namespace MWInput
         bool mGuiCursorEnabled;
         bool mJoystickLastUsed;
         bool mGamepadMousePressed;
+
+        struct DPadRepeatState
+        {
+            SDL_GameControllerButton mHeldButton = SDL_CONTROLLER_BUTTON_INVALID;
+            float mRepeatTimer = 0.0f;
+            bool mInitialDelayPassed = false;
+            int mDeviceID = -1;
+        };
+        DPadRepeatState mDPadRepeatState;
+
+        static constexpr float DPAD_REPEAT_INITIAL_DELAY = 0.3f; // 300ms
+        static constexpr float DPAD_REPEAT_INTERVAL = 0.05f; // 50ms
     };
 }
 #endif
