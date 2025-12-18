@@ -1,7 +1,7 @@
 FROM ubuntu
 LABEL maintainer="Wassim DHIF <wassimdhif@gmail.com>"
 
-ENV NPROC=16
+ENV NPROC=4
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends software-properties-common apt-utils \
