@@ -55,6 +55,7 @@ do
         'Inventory',
         'Journal',
         'QuickKeysMenu',
+        'QuickEquipMenu',
     }
     for _, key in ipairs(triggers) do
         input.registerTrigger {
@@ -213,6 +214,16 @@ input.registerTriggerHandler('QuickKeysMenu', async:callback(function()
         I.UI.removeMode(I.UI.MODE.QuickKeysMenu)
     elseif checkNotWerewolf() and Player.isCharGenFinished(self) then
         I.UI.addMode(I.UI.MODE.QuickKeysMenu)
+    end
+end))
+
+input.registerTriggerHandler('QuickEquipMenu', async:callback(function()
+    if not uiAllowed() then return end
+
+    if I.UI.getMode() == I.UI.MODE.QuickEquipMenu then
+        I.UI.removeMode(I.UI.MODE.QuickEquipMenu)
+    elseif I.UI.getMode() == nil and checkNotWerewolf() and Player.isCharGenFinished(self) then
+        I.UI.addMode(I.UI.MODE.QuickEquipMenu)
     end
 end))
 

@@ -108,6 +108,7 @@
 #include "merchantrepair.hpp"
 #include "postprocessorhud.hpp"
 #include "quickkeysmenu.hpp"
+#include "quickequipdialog.hpp"
 #include "recharge.hpp"
 #include "repair.hpp"
 #include "resourceskin.hpp"
@@ -432,6 +433,11 @@ namespace MWGui
         mQuickKeysMenu = quickKeysMenu.get();
         mWindows.push_back(std::move(quickKeysMenu));
         mGuiModeStates[GM_QuickKeysMenu] = GuiModeState(mQuickKeysMenu);
+
+        auto quickEquipDialog = std::make_unique<QuickEquipDialog>();
+        mQuickEquipDialog = quickEquipDialog.get();
+        mWindows.push_back(std::move(quickEquipDialog));
+        mGuiModeStates[GM_QuickEquipMenu] = GuiModeState(mQuickEquipDialog);
 
         auto levelupDialog = std::make_unique<LevelupDialog>();
         mGuiModeStates[GM_Levelup] = GuiModeState(levelupDialog.get());

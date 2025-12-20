@@ -45,7 +45,8 @@ namespace MWGui
         GM_LoadingWallpaper,
         GM_Jail,
 
-        GM_QuickKeysMenu
+        GM_QuickKeysMenu,
+        GM_QuickEquipMenu
     };
 
     // Windows shown in inventory mode

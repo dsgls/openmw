@@ -68,6 +68,8 @@ namespace MWInput
 
         A_TogglePostProcessorHUD = 50,
 
+        A_QuickEquipMenu = 51,
+
         A_Last // Marker for the last item
     };
 }

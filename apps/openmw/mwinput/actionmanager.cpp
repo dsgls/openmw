@@ -149,6 +149,7 @@ namespace MWInput
             case A_Inventory:
             case A_Journal:
             case A_QuickKeysMenu:
+            case A_QuickEquipMenu:
                 // Handled in Lua
                 break;
         }
