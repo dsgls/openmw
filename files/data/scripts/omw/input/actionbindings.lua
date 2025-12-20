@@ -70,6 +70,7 @@ bindTrigger('AutoMove', input.ACTION.AutoMove)
 bindTrigger('Inventory', input.ACTION.Inventory)
 bindTrigger('Journal', input.ACTION.Journal)
 bindTrigger('QuickKeysMenu', input.ACTION.QuickKeysMenu)
+bindTrigger('QuickEquipMenu', input.ACTION.QuickEquipMenu)
 
 bindHold('TogglePOV', input.ACTION.TogglePOV)
 bindHold('Sneak', input.ACTION.Sneak)

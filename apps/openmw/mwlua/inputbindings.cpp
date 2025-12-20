@@ -305,6 +305,7 @@ namespace MWLua
                 { "QuickKey9", MWInput::A_QuickKey9 },
                 { "QuickKey10", MWInput::A_QuickKey10 },
                 { "QuickKeysMenu", MWInput::A_QuickKeysMenu },
+                { "QuickEquipMenu", MWInput::A_QuickEquipMenu },
 
                 { "ToggleHUD", MWInput::A_ToggleHUD },
                 { "ToggleDebug", MWInput::A_ToggleDebug },

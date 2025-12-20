@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Layout">
+    <Widget type="Window" skin="MW_Dialog" layer="Modal" position="0 0 330 400" align="Center" name="_Main">
+
+        <Widget type="TextBox" skin="SandText" position="8 8 314 24">
+            <Property key="Caption" value="#{OMWEngine:QuickEquipMenuTitle}"/>
+            <Property key="TextAlign" value="Center"/>
+        </Widget>
+
+        <Widget type="ScrollView" skin="MW_ScrollView" position="8 38 314 352" align="Stretch" name="SlotContainer">
+            <!-- Slots populated dynamically in code -->
+        </Widget>
+
+    </Widget>
+</MyGUI>

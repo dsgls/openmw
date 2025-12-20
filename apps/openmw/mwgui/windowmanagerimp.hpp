@@ -100,6 +100,7 @@ namespace MWGui
     class SettingsWindow;
     class AlchemyWindow;
     class QuickKeysMenu;
+    class QuickEquipDialog;
     class LoadingScreen;
     class LevelupDialog;
     class WaitDialog;
@@ -187,6 +188,7 @@ namespace MWGui
         MWGui::TradeWindow* getTradeWindow() override;
         MWGui::HUD* getHud() override;
         MWGui::PostProcessorHud* getPostProcessorHud() override;
+        MWGui::QuickKeysMenu* getQuickKeysMenu() { return mQuickKeysMenu; }
         std::vector<MWGui::WindowBase*> getGuiModeWindows(GuiMode mode) override;
 
         /// Make the player use an item, while updating GUI state accordingly
@@ -458,6 +460,7 @@ namespace MWGui
         ConfirmationDialog* mConfirmationDialog;
         SpellWindow* mSpellWindow;
         QuickKeysMenu* mQuickKeysMenu;
+        QuickEquipDialog* mQuickEquipDialog;
         LoadingScreen* mLoadingScreen;
         WaitDialog* mWaitDialog;
         std::unique_ptr<SoulgemDialog> mSoulgemDialog;
