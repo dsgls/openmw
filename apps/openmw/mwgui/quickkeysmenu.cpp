@@ -725,6 +725,15 @@ namespace MWGui
 
         mMagicList->setModel(new SpellModel(MWMechanics::getPlayer()));
         mMagicList->resetScrollbars();
+
+        if (Settings::gui().mControllerMenus)
+            mMagicList->setActiveControllerWindow(true);
+    }
+
+    void MagicSelectionDialog::onClose()
+    {
+        WindowModal::onClose();
+        mMagicList->setActiveControllerWindow(false);
     }
 
     void MagicSelectionDialog::onModelIndexSelected(SpellModel::ModelIndex index)

@@ -105,6 +105,7 @@ namespace MWGui
         MagicSelectionDialog(QuickKeysMenu* parent);
 
         void onOpen() override;
+        void onClose() override;
         bool exit() override;
 
     private:

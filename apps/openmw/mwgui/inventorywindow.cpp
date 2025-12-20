@@ -1003,6 +1003,10 @@ namespace MWGui
         {
             MWBase::Environment::get().getWindowManager()->exitCurrentGuiMode();
         }
+        else if (arg.button == SDL_CONTROLLER_BUTTON_BACK)
+        {
+            MWBase::Environment::get().getWindowManager()->pushGuiMode(MWGui::GM_QuickKeysMenu);
+        }
         else if (arg.button == SDL_CONTROLLER_BUTTON_A)
         {
             if (mGuiMode == MWGui::GM_Inventory)
