@@ -136,6 +136,19 @@ MWBase::Environment::get().getSoundManager()->playSound(...);
 - Layout XML files in files/mygui/
 - Lua UI integration for custom mod content
 
+**mwinput/** - Input System
+- Low-level C++ input handling (`apps/openmw/mwinput/`)
+  - `actions.hpp`: Defines action IDs (A_Inventory, A_Jump, etc.)
+  - `actionmanager.cpp`: Low-level action execution (screenshot, activate, etc.)
+  - `bindingsmanager.cpp`: Key/button binding management, action descriptions
+- High-level Lua input handling (`files/data/scripts/omw/input/`)
+  - `actionbindings.lua`: Binds C++ actions to Lua triggers
+  - `playercontrols.lua`: Handles trigger logic for UI/gameplay actions
+- **Critical Pattern**: UI control logic (opening menus, etc.) belongs in Lua, NOT C++
+  - C++ handles only low-level actions that can't be scripted (screenshot, console, etc.)
+  - UI actions like Inventory, Journal, QuickKeysMenu use Lua trigger handlers
+  - See actionmanager.cpp cases marked "// Handled in Lua"
+
 **Frame Loop** (apps/openmw/engine.cpp:190-339):
 ```
 Input → Lua Sync → State Update → Script Execution → Mechanics →
@@ -169,6 +182,24 @@ Physics → World Update → GUI → Rendering (parallel with Lua) → Resource 
 - `lua/`: LuaJIT wrapper with async package loading
 - `lua_ui/`: Lua UI framework
 - `l10n/`: YAML-based localization system
+
+**Localization System:**
+- Localization files: `files/data/l10n/<Context>/`
+  - Contexts: `Interface`, `OMWEngine`, `OMWControls`, `OMWCamera`, etc.
+  - Each context has language files: `en.yaml`, `de.yaml`, `fr.yaml`, `pl.yaml`, `ru.yaml`, `sv.yaml`
+- GMST reference format: `#{Context:Key}` or `#{sVanillaName}`
+  - Vanilla Morrowind: `#{sInventory}`, `#{sQuickMenu}` (GMST strings from ESM files)
+  - OpenMW additions: `#{OMWEngine:QuickEquipMenu}`, `#{Interface:OK}`
+  - Special format for namespaced keys: `#{Context:Key}`
+- Usage in code:
+  - C++ action descriptions return GMST references: `return "#{OMWEngine:QuickEquipMenu}";`
+  - MyGUI layouts use same syntax: `<Property key="Caption" value="#{OMWEngine:QuickEquipMenuTitle}"/>`
+  - Runtime resolution based on user's language settings with English as fallback
+- Common contexts:
+  - `OMWEngine`: Engine-level UI strings (settings, menus, dialogs)
+  - `OMWControls`: Input control names and descriptions
+  - `Interface`: Common UI elements (OK, Cancel, etc.)
+  - Vanilla GMST: Use `#{sName}` format for original Morrowind strings
 
 **Utilities:**
 - `settings/`: Category-based settings (see openmw.readthedocs.io/reference/modding/settings/)
@@ -291,6 +322,42 @@ Bullet is configured with `BT_USE_DOUBLE_PRECISION`. Ensure new physics code res
 4. Follow existing patterns for namespace and include guards
 5. Add unit tests in apps/components_tests/
 
+### Adding a New UI Feature with Controller Support
+1. **Create GUI Mode and Dialog** (if needed):
+   - Add mode enum to `apps/openmw/mwgui/mode.hpp` (e.g., `GM_QuickEquipMenu`)
+   - Create dialog class inheriting from `WindowModal` or `WindowBase`
+   - Create MyGUI layout XML in `files/data/mygui/` using `#{Context:Key}` for captions
+   - Register dialog in `WindowManager` (windowmanagerimp.hpp/cpp)
+   - Add to CMakeLists.txt via `add_openmw_dir(mwgui ...)`
+
+2. **Add Input Action** (C++ side):
+   - Add action enum to `apps/openmw/mwinput/actions.hpp` (e.g., `A_QuickEquipMenu`)
+   - Add action description in `bindingsmanager.cpp`:
+     - `getActionDescription()`: Return `"#{OMWEngine:ActionName}"`
+     - `getActionControllerSorting()`: Add to sorted list for settings UI
+     - Do NOT add to `loadControllerDefaults()` unless it needs a default binding
+   - Add Lua input binding in `inputbindings.cpp`: Map to `input.ACTION.ActionName`
+   - Add UI mode mapping in `uibindings.cpp`: Map `GM_Mode` to Lua mode name
+
+3. **Add Input Handler** (Lua side - PREFERRED):
+   - Register trigger in `files/data/scripts/omw/input/playercontrols.lua`
+   - Add trigger name to triggers list
+   - Implement handler using `input.registerTriggerHandler()`
+   - Bind action in `files/data/scripts/omw/input/actionbindings.lua`
+   - Mark as "// Handled in Lua" in `actionmanager.cpp`
+
+4. **Add Localization**:
+   - Add strings to `files/data/l10n/OMWEngine/en.yaml` for UI text
+   - Add strings to `files/data/l10n/OMWControls/en.yaml` for input descriptions
+   - Use `#{Context:Key}` references in C++ and MyGUI layouts
+   - Other languages will be translated by community later
+
+5. **Build and Test**:
+   - Verify compilation
+   - Test with keyboard and controller
+   - Verify localization strings resolve correctly
+   - Check settings UI shows action with proper description
+
 ### Modifying the Frame Loop
 Be extremely careful when changing engine.cpp frame sequencing:
 - Physics must complete before rendering
@@ -342,6 +409,13 @@ Use `OPENMW_USE_SYSTEM_<LIB>=ON/OFF` to choose system vs bundled versions.
 - `apps/openmw/mwbase/environment.hpp` - Central subsystem access point
 - `apps/openmw/mwworld/worldimp.hpp` - World coordinator
 - `apps/openmw/mwlua/luamanagerimp.hpp` - Lua execution manager
+- `apps/openmw/mwinput/actions.hpp` - Input action definitions
+- `apps/openmw/mwinput/actionmanager.cpp` - Low-level action execution
+- `apps/openmw/mwinput/bindingsmanager.cpp` - Key/controller binding management
+- `files/data/scripts/omw/input/playercontrols.lua` - High-level input handlers (Lua)
+- `files/data/scripts/omw/input/actionbindings.lua` - C++ to Lua action bindings
+- `files/data/l10n/` - Localization files (YAML format)
+- `files/data/mygui/` - MyGUI layout XML files
 - `components/esm/esmstore.hpp` - Game data repository
 - `components/resource/resourcesystem.hpp` - Asset management
 - `components/detournavigator/navigator.hpp` - Pathfinding interface
