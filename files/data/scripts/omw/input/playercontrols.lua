@@ -56,6 +56,7 @@ do
         'Journal',
         'QuickKeysMenu',
         'QuickEquipMenu',
+        'ToggleFavorite',
     }
     for _, key in ipairs(triggers) do
         input.registerTrigger {

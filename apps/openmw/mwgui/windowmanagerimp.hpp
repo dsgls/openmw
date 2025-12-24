@@ -25,6 +25,7 @@
 
 #include "charactercreation.hpp"
 #include "draganddrop.hpp"
+#include "favoritesmanager.hpp"
 #include "mapwindow.hpp"
 #include "messagebox.hpp"
 #include "settings.hpp"
@@ -189,6 +190,7 @@ namespace MWGui
         MWGui::HUD* getHud() override;
         MWGui::PostProcessorHud* getPostProcessorHud() override;
         MWGui::QuickKeysMenu* getQuickKeysMenu() { return mQuickKeysMenu; }
+        MWGui::FavoritesManager* getFavoritesManager() override;
         std::vector<MWGui::WindowBase*> getGuiModeWindows(GuiMode mode) override;
 
         /// Make the player use an item, while updating GUI state accordingly
@@ -424,6 +426,7 @@ namespace MWGui
 
         std::unique_ptr<Gui::FontLoader> mFontLoader;
         std::unique_ptr<StatsWatcher> mStatsWatcher;
+        std::unique_ptr<FavoritesManager> mFavoritesManager;
 
         bool mConsoleOnlyScripts;
 

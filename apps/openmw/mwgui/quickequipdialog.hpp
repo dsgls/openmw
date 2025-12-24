@@ -3,6 +3,14 @@
 
 #include "windowbase.hpp"
 
+#include <components/esm3/favorites.hpp>
+#include <components/esm3/quickkeys.hpp>
+
+namespace MWWorld
+{
+    class Ptr;
+}
+
 namespace MWGui
 {
     class QuickEquipDialog : public WindowModal
@@ -17,10 +25,12 @@ namespace MWGui
     private:
         struct SlotEntry
         {
-            int index;                  // Quickkey slot number (1-10)
+            ESM::QuickKeys::Type type;  // Item, Magic, or MagicItem
+            ESM::RefId id;              // Item or spell ID
+            std::string name;           // Display name
             MyGUI::Button* button;      // Container button
-            MyGUI::ImageBox* icon;      // Icon display
-            MyGUI::TextBox* label;      // Name text
+            MyGUI::ImageBox* icon;      // Icon display (unused for now)
+            MyGUI::TextBox* label;      // Name text (unused for now)
         };
 
         std::vector<SlotEntry> mSlots;
@@ -29,7 +39,7 @@ namespace MWGui
 
         void populateSlots();
         void onSlotClicked(MyGUI::Widget* sender);
-        void activateSlot(int index);
+        void activateSlot(size_t slotIndex);
 
         bool onControllerButtonEvent(const SDL_ControllerButtonEvent& arg) override;
     };

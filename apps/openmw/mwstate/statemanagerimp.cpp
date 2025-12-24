@@ -556,6 +556,7 @@ void MWState::StateManager::loadGame(const Character* character, const std::file
 
                 case ESM::REC_GMAP:
                 case ESM::REC_KEYS:
+                case ESM::REC_FAVS:
                 case ESM::REC_ASPL:
                 case ESM::REC_MARK:
 

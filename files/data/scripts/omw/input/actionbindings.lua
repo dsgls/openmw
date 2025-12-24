@@ -71,6 +71,7 @@ bindTrigger('Inventory', input.ACTION.Inventory)
 bindTrigger('Journal', input.ACTION.Journal)
 bindTrigger('QuickKeysMenu', input.ACTION.QuickKeysMenu)
 bindTrigger('QuickEquipMenu', input.ACTION.QuickEquipMenu)
+bindTrigger('ToggleFavorite', input.ACTION.ToggleFavorite)
 
 bindHold('TogglePOV', input.ACTION.TogglePOV)
 bindHold('Sneak', input.ACTION.Sneak)

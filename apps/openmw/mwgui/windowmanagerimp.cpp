@@ -308,6 +308,7 @@ namespace MWGui
             mGuiPlatform->getRenderManagerPtr()->enableShaders(mResourceSystem->getSceneManager()->getShaderManager());
 
         mStatsWatcher = std::make_unique<StatsWatcher>();
+        mFavoritesManager = std::make_unique<FavoritesManager>();
     }
 
     void WindowManager::initUI()
@@ -1658,6 +1659,10 @@ namespace MWGui
     {
         return mHud;
     }
+    MWGui::FavoritesManager* WindowManager::getFavoritesManager()
+    {
+        return mFavoritesManager.get();
+    }
     MWGui::TradeWindow* WindowManager::getTradeWindow()
     {
         return mTradeWindow;
@@ -1984,6 +1989,7 @@ namespace MWGui
 
         mSelectedSpell = ESM::RefId();
         mCustomMarkers.clear();
+        mFavoritesManager->clear();
 
         mForceHidden = GW_None;
         mRestAllowed = true;
@@ -1999,6 +2005,7 @@ namespace MWGui
         mMap->write(writer, progress);
 
         mQuickKeysMenu->write(writer);
+        mFavoritesManager->write(writer);
 
         if (!mSelectedSpell.empty())
         {
@@ -2021,6 +2028,8 @@ namespace MWGui
             mMap->readRecord(reader, type);
         else if (type == ESM::REC_KEYS)
             mQuickKeysMenu->readRecord(reader, type);
+        else if (type == ESM::REC_FAVS)
+            mFavoritesManager->readRecord(reader, type);
         else if (type == ESM::REC_ASPL)
         {
             reader.getSubNameIs("ID__");
@@ -2040,7 +2049,7 @@ namespace MWGui
     {
         return 1 // Global map
             + 1 // QuickKeysMenu
-            + mCustomMarkers.size() + (!mSelectedSpell.empty() ? 1 : 0);
+            + mFavoritesManager->countSavedGameRecords() + mCustomMarkers.size() + (!mSelectedSpell.empty() ? 1 : 0);
     }
 
     bool WindowManager::isSavingAllowed() const
