@@ -32,9 +32,9 @@ docker run -v ./:/openmw --rm openmw.ubuntu \
   -DBUILD_BENCHMARKS=ON
 
 # Build specific targets
-docker run -v ./:/openmw --rm openmw.ubuntu --build . --target openmw
-docker run -v ./:/openmw --rm openmw.ubuntu --build . --target opencs
-docker run -v ./:/openmw --rm openmw.ubuntu --build . --target components_tests
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && cmake --build . --target openmw
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && cmake --build . --target opencs
+docker run -v ./:/openmw --rm --entrypoint sh openmw.ubuntu -c 'cd /openmw/build && cmake --build . --target components_tests
 ```
 
 ### Testing
