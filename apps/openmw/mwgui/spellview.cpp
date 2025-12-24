@@ -13,6 +13,7 @@
 #include "../mwbase/inputmanager.hpp"
 #include "../mwbase/windowmanager.hpp"
 
+#include "favoritesmanager.hpp"
 #include "tooltips.hpp"
 #include "windowbase.hpp"
 
@@ -112,8 +113,26 @@ namespace MWGui
             Gui::SharedStateButton* t = mScrollView->createWidget<Gui::SharedStateButton>(
                 skin, MyGUI::IntCoord(0, 0, 0, spellHeight), MyGUI::Align::Left | MyGUI::Align::Top);
             t->setNeedKeyFocus(true);
-            t->setCaption(spell.mName + captionSuffix);
+            // Add padding to all spell names to make room for the favorite star
+            t->setCaption("    " + spell.mName + captionSuffix);
             t->setTextAlign(MyGUI::Align::Left);
+
+            // Add favorite star if this spell/item is favorited
+            FavoritesManager* favMgr = MWBase::Environment::get().getWindowManager()->getFavoritesManager();
+            bool isFavorite = false;
+            if (spell.mType == Spell::Type_EnchantedItem && !spell.mItem.isEmpty())
+                isFavorite = favMgr->isFavorite(spell.mItem, true); // Check as MagicItem
+            else
+                isFavorite = favMgr->isFavorite(spell.mId);
+
+            if (isFavorite)
+            {
+                MyGUI::ImageBox* star = t->createWidget<MyGUI::ImageBox>(
+                    "ImageBox", MyGUI::IntCoord(2, (spellHeight - 14) / 2, 14, 14), MyGUI::Align::Left | MyGUI::Align::Top, "FavoriteStar");
+                star->setImageTexture("textures\\omw_favorite_star.dds");
+                star->setNeedMouseFocus(false);
+            }
+
             adjustSpellWidget(spell, i, t);
             mButtons.emplace_back(t, i);
 
@@ -403,6 +422,30 @@ namespace MWGui
                 mControllerFocus = newFocus;
             }
             break;
+            case SDL_CONTROLLER_BUTTON_Y:
+                // Toggle favorite on focused spell
+                if (mControllerFocus < mButtons.size())
+                {
+                    SpellModel::ModelIndex index = getSpellModelIndex(mButtons[mControllerFocus].first);
+                    if (index >= 0 && index < static_cast<int>(mModel->getItemCount()))
+                    {
+                        const Spell& spell = mModel->getItem(index);
+                        if (spell.mType == Spell::Type_EnchantedItem)
+                        {
+                            // For enchanted items, toggle using the item Ptr as MagicItem
+                            if (!spell.mItem.isEmpty())
+                                winMgr->getFavoritesManager()->toggleFavorite(spell.mItem, true);
+                        }
+                        else
+                        {
+                            // For spells and powers, toggle using the spell RefId
+                            winMgr->getFavoritesManager()->toggleFavorite(spell.mId);
+                        }
+                        update(); // Refresh to show/hide favorite star
+                        winMgr->playSound(ESM::RefId::stringRefId("Menu Click"));
+                    }
+                }
+                return;
             default:
                 return;
         }

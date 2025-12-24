@@ -70,6 +70,8 @@ namespace MWInput
 
         A_QuickEquipMenu = 51,
 
+        A_ToggleFavorite = 52,
+
         A_Last // Marker for the last item
     };
 }

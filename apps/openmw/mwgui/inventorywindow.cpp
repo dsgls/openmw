@@ -1070,6 +1070,23 @@ namespace MWGui
                 onFilterChanged(mFilterAll);
             MWBase::Environment::get().getWindowManager()->playSound(ESM::RefId::stringRefId("Menu Click"));
         }
+        else if (arg.button == SDL_CONTROLLER_BUTTON_Y)
+        {
+            // Toggle favorite on focused item
+            int focusedIndex = mItemView->getControllerFocus();
+            int sourceIndex = mSortModel->mapToSource(focusedIndex);
+            if (sourceIndex >= 0 && sourceIndex < static_cast<int>(mTradeModel->getItemCount()))
+            {
+                const ItemStack& item = mTradeModel->getItem(sourceIndex);
+                if (!item.mBase.isEmpty())
+                {
+                    MWBase::Environment::get().getWindowManager()->getFavoritesManager()->toggleFavorite(item.mBase);
+                    updateItemView(); // Refresh to show/hide favorite star
+                    MWBase::Environment::get().getWindowManager()->playSound(
+                        ESM::RefId::stringRefId("Menu Click"));
+                }
+            }
+        }
         else
         {
             mItemView->onControllerButton(arg.button);

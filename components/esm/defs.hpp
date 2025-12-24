@@ -120,6 +120,7 @@ namespace ESM
         REC_DIAS = esm3Recname("DIAS"),
         REC_WTHR = esm3Recname("WTHR"),
         REC_KEYS = esm3Recname("KEYS"),
+        REC_FAVS = esm3Recname("FAVS"), // Favorites (Quick Equip)
         REC_DYNA = esm3Recname("DYNA"),
         REC_ASPL = esm3Recname("ASPL"),
         REC_ACTC = esm3Recname("ACTC"),

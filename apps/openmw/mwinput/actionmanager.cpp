@@ -150,6 +150,7 @@ namespace MWInput
             case A_Journal:
             case A_QuickKeysMenu:
             case A_QuickEquipMenu:
+            case A_ToggleFavorite:
                 // Handled in Lua
                 break;
         }

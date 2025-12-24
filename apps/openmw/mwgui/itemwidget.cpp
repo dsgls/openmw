@@ -12,8 +12,11 @@
 #include <components/vfs/manager.hpp>
 
 #include "../mwbase/environment.hpp"
+#include "../mwbase/windowmanager.hpp"
 
 #include "../mwworld/class.hpp"
+
+#include "favoritesmanager.hpp"
 
 namespace
 {
@@ -60,6 +63,7 @@ namespace MWGui
         , mFrame(nullptr)
         , mControllerBorder(nullptr)
         , mText(nullptr)
+        , mFavoriteIcon(nullptr)
     {
     }
 
@@ -83,6 +87,9 @@ namespace MWGui
         assignWidget(mText, "Text");
         if (mText)
             mText->setNeedMouseFocus(false);
+        assignWidget(mFavoriteIcon, "FavoriteIcon");
+        if (mFavoriteIcon)
+            mFavoriteIcon->setNeedMouseFocus(false);
         if (Settings::gui().mControllerMenus)
         {
             assignWidget(mControllerBorder, "ControllerBorder");
@@ -166,6 +173,8 @@ namespace MWGui
             mText->setCaption({});
             mCurrentIcon.clear();
             mCurrentFrame.clear();
+            if (mFavoriteIcon)
+                mFavoriteIcon->setVisible(false);
             return;
         }
 
@@ -216,6 +225,13 @@ namespace MWGui
             setFrame(backgroundTex, MyGUI::IntCoord(0, 0, diameter, diameter));
 
         setIcon(ptr);
+
+        // Update favorite icon visibility
+        if (mFavoriteIcon)
+        {
+            bool isFavorite = MWBase::Environment::get().getWindowManager()->getFavoritesManager()->isFavorite(ptr);
+            mFavoriteIcon->setVisible(isFavorite);
+        }
     }
 
     void SpellWidget::setSpellIcon(std::string_view icon)

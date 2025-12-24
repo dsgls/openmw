@@ -74,6 +74,9 @@ QuickKeysMenu_description: "Open the quick keys menu."
 QuickEquipMenu_name: "Quick Equip Menu"
 QuickEquipMenu_description: "Open the quick equip menu."
 
+ToggleFavorite_name: "Toggle Favorite"
+ToggleFavorite_description: "Add or remove the selected item or spell from favorites."
+
 SmoothMoveForward_name: "Smooth Move Forward"
 SmoothMoveForward_description: "Forward movement adjusted for smooth Walk-Run transitions."
 

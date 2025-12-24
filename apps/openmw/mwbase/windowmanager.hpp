@@ -80,6 +80,7 @@ namespace MWGui
     class SettingsWindow;
     class HUD;
     class WindowBase;
+    class FavoritesManager;
 
     enum ShowInDialogueMode
     {
@@ -162,6 +163,8 @@ namespace MWBase
         virtual MWGui::HUD* getHud() = 0;
         virtual MWGui::PostProcessorHud* getPostProcessorHud() = 0;
         virtual std::vector<MWGui::WindowBase*> getGuiModeWindows(MWGui::GuiMode mode) = 0;
+
+        virtual MWGui::FavoritesManager* getFavoritesManager() = 0;
 
         /// Make the player use an item, while updating GUI state accordingly
         virtual void useItem(const MWWorld::Ptr& item, bool force = false) = 0;
