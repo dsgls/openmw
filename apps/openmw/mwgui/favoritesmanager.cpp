@@ -88,6 +88,24 @@ namespace MWGui
         return mFavorites.mFavorites.empty() ? 0 : 1;
     }
 
+    bool FavoritesManager::moveFavoriteUp(size_t index)
+    {
+        if (index == 0 || index >= mFavorites.mFavorites.size())
+            return false;
+
+        std::swap(mFavorites.mFavorites[index], mFavorites.mFavorites[index - 1]);
+        return true;
+    }
+
+    bool FavoritesManager::moveFavoriteDown(size_t index)
+    {
+        if (index >= mFavorites.mFavorites.size() - 1)
+            return false;
+
+        std::swap(mFavorites.mFavorites[index], mFavorites.mFavorites[index + 1]);
+        return true;
+    }
+
     // Private helpers
 
     void FavoritesManager::addFavorite(ESM::QuickKeys::Type type, const ESM::RefId& id)

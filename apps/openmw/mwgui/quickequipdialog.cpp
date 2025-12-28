@@ -99,14 +99,16 @@ namespace MWGui
         MWWorld::Ptr player = MWMechanics::getPlayer();
         MWWorld::InventoryStore& store = player.getClass().getInventoryStore(player);
 
-        // Build list of available favorites
-        for (const auto& fav : favorites)
+        // Build list of available favorites, preserving user-defined order
+        for (size_t i = 0; i < favorites.size(); ++i)
         {
+            const auto& fav = favorites[i];
             SlotEntry entry;
             entry.type = fav.mType;
             entry.id = fav.mId;
             entry.icon = nullptr;
             entry.label = nullptr;
+            entry.favoritesIndex = i;
 
             bool isAvailable = false;
 
@@ -147,19 +149,6 @@ namespace MWGui
             if (isAvailable)
                 mSlots.push_back(entry);
         }
-
-        // Sort: spells first, then magic items, then regular items
-        std::sort(mSlots.begin(), mSlots.end(), [](const SlotEntry& a, const SlotEntry& b) {
-            int orderA = (a.type == ESM::QuickKeys::Type::Magic) ? 1
-                : (a.type == ESM::QuickKeys::Type::MagicItem)   ? 2
-                                                                 : 3;
-            int orderB = (b.type == ESM::QuickKeys::Type::Magic) ? 1
-                : (b.type == ESM::QuickKeys::Type::MagicItem)   ? 2
-                                                                 : 3;
-            if (orderA != orderB)
-                return orderA < orderB;
-            return a.name < b.name;
-        });
 
         // Create UI widgets
         int yOffset = 0;
@@ -294,6 +283,96 @@ namespace MWGui
         MWBase::Environment::get().getWindowManager()->removeGuiMode(GM_QuickEquipMenu);
     }
 
+    void QuickEquipDialog::moveItemUp()
+    {
+        if (mSlots.empty() || mControllerFocus >= mSlots.size())
+            return;
+
+        // Remember the item we're moving
+        ESM::RefId movedItemId = mSlots[mControllerFocus].id;
+        ESM::QuickKeys::Type movedItemType = mSlots[mControllerFocus].type;
+        size_t favIndex = mSlots[mControllerFocus].favoritesIndex;
+
+        // Try to move it up in the favorites list
+        FavoritesManager* favMgr = MWBase::Environment::get().getWindowManager()->getFavoritesManager();
+        if (favMgr && favMgr->moveFavoriteUp(favIndex))
+        {
+            // Refresh the display
+            populateSlots();
+
+            // Find the moved item in the new slot list
+            for (size_t i = 0; i < mSlots.size(); ++i)
+            {
+                if (mSlots[i].id == movedItemId && mSlots[i].type == movedItemType)
+                {
+                    mControllerFocus = i;
+                    break;
+                }
+            }
+
+            // Restore focus highlight and update scroll position
+            if (!mSlots.empty() && mControllerFocus < mSlots.size())
+            {
+                auto* btn = static_cast<Gui::SharedStateButton*>(mSlots[mControllerFocus].button);
+                btn->onMouseSetFocus(nullptr);
+
+                // Update scroll position to keep focused item visible
+                if (mControllerFocus <= 5)
+                    mSlotContainer->setViewOffset(MyGUI::IntPoint(0, 0));
+                else
+                {
+                    const int itemHeight = btn->getHeight();
+                    mSlotContainer->setViewOffset(MyGUI::IntPoint(0, -itemHeight * (mControllerFocus - 5)));
+                }
+            }
+        }
+    }
+
+    void QuickEquipDialog::moveItemDown()
+    {
+        if (mSlots.empty() || mControllerFocus >= mSlots.size())
+            return;
+
+        // Remember the item we're moving
+        ESM::RefId movedItemId = mSlots[mControllerFocus].id;
+        ESM::QuickKeys::Type movedItemType = mSlots[mControllerFocus].type;
+        size_t favIndex = mSlots[mControllerFocus].favoritesIndex;
+
+        // Try to move it down in the favorites list
+        FavoritesManager* favMgr = MWBase::Environment::get().getWindowManager()->getFavoritesManager();
+        if (favMgr && favMgr->moveFavoriteDown(favIndex))
+        {
+            // Refresh the display
+            populateSlots();
+
+            // Find the moved item in the new slot list
+            for (size_t i = 0; i < mSlots.size(); ++i)
+            {
+                if (mSlots[i].id == movedItemId && mSlots[i].type == movedItemType)
+                {
+                    mControllerFocus = i;
+                    break;
+                }
+            }
+
+            // Restore focus highlight and update scroll position
+            if (!mSlots.empty() && mControllerFocus < mSlots.size())
+            {
+                auto* btn = static_cast<Gui::SharedStateButton*>(mSlots[mControllerFocus].button);
+                btn->onMouseSetFocus(nullptr);
+
+                // Update scroll position to keep focused item visible
+                if (mControllerFocus <= 5)
+                    mSlotContainer->setViewOffset(MyGUI::IntPoint(0, 0));
+                else
+                {
+                    const int itemHeight = btn->getHeight();
+                    mSlotContainer->setViewOffset(MyGUI::IntPoint(0, -itemHeight * (mControllerFocus - 5)));
+                }
+            }
+        }
+    }
+
     bool QuickEquipDialog::onControllerButtonEvent(const SDL_ControllerButtonEvent& arg)
     {
         // Always handle B button to allow closing the dialog
@@ -310,6 +389,14 @@ namespace MWGui
         if (arg.button == SDL_CONTROLLER_BUTTON_A)
         {
             activateSlot(mControllerFocus);
+        }
+        else if (arg.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && arg.state == SDL_PRESSED)
+        {
+            moveItemUp();
+        }
+        else if (arg.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER && arg.state == SDL_PRESSED)
+        {
+            moveItemDown();
         }
         else if (arg.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
         {

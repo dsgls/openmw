@@ -48,6 +48,14 @@ namespace MWGui
         /// Clear all favorites
         void clear() { mFavorites.mFavorites.clear(); }
 
+        /// Move favorite at index up one position (swap with previous)
+        /// Returns true if move succeeded, false if already at top or invalid index
+        bool moveFavoriteUp(size_t index);
+
+        /// Move favorite at index down one position (swap with next)
+        /// Returns true if move succeeded, false if already at bottom or invalid index
+        bool moveFavoriteDown(size_t index);
+
         /// Save/load from savegame
         void write(ESM::ESMWriter& writer) const;
         void readRecord(ESM::ESMReader& reader, uint32_t type);

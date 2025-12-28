@@ -31,6 +31,7 @@ namespace MWGui
             MyGUI::Button* button;      // Container button
             MyGUI::ImageBox* icon;      // Icon display (unused for now)
             MyGUI::TextBox* label;      // Name text (unused for now)
+            size_t favoritesIndex;      // Index in FavoritesManager list
         };
 
         std::vector<SlotEntry> mSlots;
@@ -40,6 +41,8 @@ namespace MWGui
         void populateSlots();
         void onSlotClicked(MyGUI::Widget* sender);
         void activateSlot(size_t slotIndex);
+        void moveItemUp();
+        void moveItemDown();
 
         bool onControllerButtonEvent(const SDL_ControllerButtonEvent& arg) override;
     };
