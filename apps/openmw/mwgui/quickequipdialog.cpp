@@ -51,6 +51,9 @@ namespace MWGui
         WindowModal::onOpen();
         populateSlots();
 
+        // Reset scroll position to top
+        mSlotContainer->setViewOffset(MyGUI::IntPoint(0, 0));
+
         if (Settings::gui().mControllerMenus && !mSlots.empty())
         {
             mControllerFocus = 0;
